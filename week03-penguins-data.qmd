@@ -285,7 +285,7 @@ see above
 
 ```{r, message=FALSE, warning=FALSE}
 
-plotname <- ggplot(data = penguins_data, aes(x = culmen_depth_mm), fill = species) +
+plotname <- ggplot(data = penguins_data, aes(x = culmen_depth_mm, fill = species)) +
   geom_histogram() +
   theme_bw() +
   scale_fill_viridis_d(option = "mako") +
