@@ -291,10 +291,10 @@ plotname <- ggplot(data = penguins_data, aes(x = culmen_depth_mm, fill = species
   scale_fill_viridis_d(option = "mako") +
   labs(title = "Palmer Penguins",
        subtitle = "Culmen depth of Palmer Penguins",
-       x = "Culmen depth",
+       x = "Culmen depth (mm)",
        y = "Number of Penguins")
 
-ggplotly(plotname)
+ggplotly(plotname) # makes it interactive after assigning to plotname
 ```
 
 - Part 2
@@ -302,7 +302,14 @@ ggplotly(plotname)
   - In the code chunk below create a **scatter plot** with `culmen_depth_mm` on the x axis, `body_mass_g` on the y axis, and `color` by `species` using the data frame *penguins_data*. Give the plot the theme: `theme_bw()`. Assign a color palette with `scale_color_viridis_d(option = "mako")`. Give the plot a title, subtitle and custom x and y axis titles.
 
 ```{r, message=FALSE, warning=FALSE}
-
+ggplot(data = penguins_data, aes(x = culmen_depth_mm, y = body_mass_g, color = species)) +
+  geom_point() +
+  theme_bw() +
+  scale_colour_viridis_d(option = "mako", name = "Species") +
+  labs(title = "Palmer Penguins",
+       subtitle = "The culmen depth and body mass of each species",
+       x = "Culmen Depth (mm)",
+       y = "Body Mass (g)")
 
 
 ```
@@ -318,9 +325,17 @@ ggplotly(plotname)
     - Run `ggplotly(plot_name)` and explore! Edit `plot_name` accordingly
 
 ```{r, message=FALSE}
+Palmer_Penguins <- ggplot(data = penguins_data, aes(x = culmen_depth_mm, y = body_mass_g, color = species)) +
+  geom_point() +
+  theme_bw() +
+  scale_colour_viridis_d(option = "mako", name = "Species") +
+  labs(title = "Palmer Penguins",
+       subtitle = "The culmen depth and body mass of each species",
+       x = "Culmen Depth (mm)",
+       y = "Body Mass (g)")
 
-
-
+# plotly
+ggplotly(Palmer_Penguins)
 ```
 
 ## Push to GitHub!
