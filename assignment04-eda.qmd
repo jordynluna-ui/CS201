@@ -29,6 +29,7 @@ Part 1 is worth a total of 1 point, and Part 2 is worth 4 points (1 point for ea
 
 ```{r, message=FALSE}
 library(tidyverse)
+library(plotly)
 
 avengers_data <- read_csv("data/avengers_dataset.csv")
 
@@ -40,7 +41,7 @@ Data author: N/A
 
 Link: <https://www.kaggle.com/datasets/mayankgariyamldev/avenger-data-iris-data-of-avenger-world>
 
-Description: Data set on the five superheros in the MCU about their ability and movie apperences
+Description: Data set on the five superheros in the Avengers about their power, level of their different abilities, and movie appeariencies.
 
 ### Preview your data
 
@@ -82,13 +83,13 @@ avengers_data$gender <- as.factor(avengers_data$gender) # changed gender from ch
 class(avengers_data$gender)
 summary(avengers_data$gender)
 
-skim_data <- skimr::skim(avengers_data)
+skim_data <- skimr::skim(avengers_data) # check the class each variable is
 view(skim_data)
 
 avengers_data |> 
-  count(name, power, gender)
+  count(name, power, gender)  # to see category frequencies
 
-avengers_data |> 
+avengers_data |>            # found the summaries for name
   group_by(name) |> 
   summarize(
     mean = mean(strength),
@@ -102,6 +103,8 @@ avengers_data |>
 Write 2–3 sentences here: What do the category counts tell you? What does the numeric summary show about spread, center, or outliers?
 
 The category counts tell me how many times specific categories with the same observations come up. The numeric summary tells me the average strength of the superheros. The superhero with the strongest average strength is Hulk and the superhero with the weakest average strength is Black Widow.
+
+# Continue Here
 
 ## Part 2: Visualize Your Data
 
@@ -121,45 +124,66 @@ Use the EDA Part 3 notes as your reference. Since this is an EDA assignment, you
 
 ```{r}
 # insert code here
+ggplot(data = avengers_data, aes(x = name, y = strength)) + 
+  geom_boxplot() +
+  theme_bw() +
+  labs(title = "Strength of Each Avenger",
+       x = "Name",
+       y = "Strength")
 
 ```
 
-Question this plot answers:
+Question this plot answers: Who is the strongest avenger over all the Marvel movies?
 
-Interpretation:
+Interpretation: Over every Marvel movie, this plot shows the mean of the strength of each avenger. What is interesting is that other than the hulk, all the other avengers' strength have a big range of strength power. Although Black Widow has the lowest mean, her highest outlier of strength rivals Captain America, Ironman, and Spiderman.
 
 ### Plot 2
 
 ```{r}
 # insert code here
 
+ggplot(na.omit(avengers_data), aes(x = name, y = power)) +
+  geom_point() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1, size = 5)) +
+  labs(title = "With Great Power Comes Great Responsibility",
+       x = "Name",
+       y = "Power description") 
 ```
 
-Question this plot answers:
+Question this plot answers: What are the different powers does each avenger have?
 
-Interpretation:
+Interpretation: There are many different powers, abilities, and gadgets that make each person a superhero. None of the avengers have overlapping powers in this plot which was interesting to see. It shows that each superhero brings something different to the Avengers.
 
 ### Plot 3
 
 ```{r}
 # insert code here
-
+avengers_SvsA <- ggplot(data = avengers_data, aes(x = strength, y = agility)) +
+  geom_jitter(alpha = 0.4, width = 0.5, color = "purple") +
+  labs(title = "Strength vs Agility",
+       x = "strength",
+       y = "agility") +
+  geom_smooth(method = "lm", se = FALSE)
+  
+  
+ggplotly(avengers_SvsA)
 ```
 
-Question this plot answers:
+Question this plot answers: Does more strength mean less agility and vice versa or is there no correlation?
 
-Interpretation:
+Interpretation: Mostly when agility his the highest it has less strength and when strength is the highest it has the lowest agility. Although there are a lot of outliers, like one being 90 in strength and 99 in agility, with the line of best fit we can see that there is a correlation overall that a superhero with a higher agility has less strength and vice versa.
 
 ### Plot 4
 
 ```{r}
 # insert code here
-
+ggplot(data = avengers_data, aes(x = intelligence, y = after_stat(density))) +
+  geom_freqpoly(aes(color = name), binwidth = .1, linewidth = 0.75)
 ```
 
-Question this plot answers:
+Question this plot answers: Who is the most intelligent avenger?
 
-Interpretation:
+Interpretation: The most intelligent avenger is Ironman. This wasn't surprising because made his own Ironman suit in a cave with a box of scraps and continued to improve the suit. After Ironman, it is close between Black Widow and Captain America and then it is Spiderman. This surprised me because Spiderman is known to be highly intelligent and was under the guidance of Ironman. This may suggest that this variable uses more than just academic intelligence although the data set doesn't specify exactly what. The least intelligent avenger is the Hulk. Which makes sense because he acts on his emotions, which is mostly anger.
 
 ------------------------------------------------------------------------
 
