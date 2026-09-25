@@ -254,11 +254,12 @@ Adding color bins, based on manual/equal interval breaks. (There are more advanc
 #| label: add-bins
 
 mapping_data <- mapping_data |> 
-  mutate(percentage_bin = cut(percentage_completed, breaks=c(0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100)))
+  mutate(percentage_bin = cut(percentage_completed, breaks=c(0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100), right = FALSE))
 
 # check out the column you just added
 head(mapping_data)
 
+?cut
 ```
 
 `cut()` reads as: "take this numeric column and sort each value into one of these labeled ranges." What does a bin label like `(40,50]` mean?
@@ -274,13 +275,13 @@ percent_complete_binned_int <- ggplot(mapping_data) +
   geom_sf_interactive(
     aes(geometry = geometry,
       fill = percentage_bin,
-      tooltip = paste("State FIPS:", stfips, # add state abbreviation if you want
+      tooltip = paste("State:", state_abbv, "<br>State FIPS:", stfips, # add state abbreviation if you want
                       "<br>Completed:", round(percentage_completed,2), "%")),
     color = "#ffffff", linewidth = 0.25) +
   labs(fill = "% of Completed Treatment Episodes",
        title = "Completed Treatment Episodes by State",
        subtitle = "TEDS-D 2024 (SAMHSA)") +
-  scale_fill_viridis_d(option = "mako") + 
+  scale_fill_viridis_d(option = "mako", direction = -1) + # flip direction of colors
   coord_sf(datum = NA) +
   theme_minimal() +
   theme(panel.background = element_blank(),
@@ -303,5 +304,32 @@ Notice anything weird with the above?? Try both to identify the problem and to f
 ### Sandbox
 
 ```{r}
+mapping_data <- mapping_data |> # ranges
+  mutate(percentage_bin = cut(percentage_completed, breaks=c(0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100), right = FALSE)),
+  precentage_bin = (fct_na_value_to_level(percentage_bin, level = "No Data"))
+
+
+percent_complete_binned_int <- ggplot(mapping_data) +
+  geom_sf_interactive(
+    aes(geometry = geometry,
+        fill = percentage_bin,
+        tooltip = paste("State:", state_abbv, "<br>State FIPS:", stfips, # add state abbreviation if you want
+                        "<br>Completed:", round(percentage_completed,2), "%")),
+    color = "#ffffff", linewidth = 0.25) + # change fffff for the outline
+  labs(fill = "% of Completed Treatment Episodes",
+       title = "Completed Treatment Episodes by State",
+       subtitle = "TEDS-D 2024 (SAMHSA)") +
+  scale_fill_viridis_d(option = "mako", direction = -1, na.value = "gray") + # flip direction of colors, fill NA values with a specific color.
+  coord_sf(datum = NA) +
+  theme_classic()
+  theme(panel.background = element_blank(),
+        axis.ticks = element_blank(),
+        axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        legend.text = element_text(size = 4),
+        legend.title = element_text(size = 5),
+        strip.text = element_text(size = 4))
+
+girafe(ggobj = percent_complete_binned_int)
 
 ```
