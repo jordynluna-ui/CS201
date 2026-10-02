@@ -233,7 +233,8 @@ los_completed_treatment <- teds_d |> # ranges
     los == 34 ~ "91-120 Days",
     los == 35 ~ "121-180 Days",
     los == 36 ~ "181-365 Days",
-    los == 37 ~ "More than a year"))
+    los == 37 ~ "More than a year",
+    TRUE ~ NA_character_))
 
 los_services_completed <- los_completed_treatment |> 
   group_by(los_bin) |> 
@@ -261,10 +262,44 @@ Then, in a sentence, say what this combined view shows that your two separate ch
 
 ```{r}
 #| label: extra-credit
+los_completed_treatment <- teds_d |> # ranges
+  mutate(los_bin = case_when(
+    los <= 15 ~ "1-15 Days",
+    los > 15 & los <= 30 ~ "16-30 Days",
+    los == 31 ~ "31-45 Days",
+    los == 32 ~ "46-60 Days",
+    los == 33 ~ "61-90 Days",
+    los == 34 ~ "91-120 Days",
+    los == 35 ~ "121-180 Days",
+    los == 36 ~ "181-365 Days",
+    los == 37 ~ "More than a year",
+    TRUE ~ NA_character_),
+los_bin = factor(los_bin, levels = c("16-30 Days",
+                                       "1-15 Days",
+                                       "61-90 Days",
+                                       "121-180 Days",
+                                       "91-120 Days",
+                                       "31-45 Days",
+                                       "46-60 Days",
+                                       "181-365 Days",
+                                       "More than a year")))
 
+los_services_treatment_completed <- los_completed_treatment |> 
+  group_by(services_d, los_bin) |> 
+  summarize(total_cases = n(),
+            completed_treatment = sum(reason == "Treatment completed", na.rm = TRUE)) |> 
+  mutate(los_completed_percentage = (completed_treatment / total_cases) * 100)
+
+ggplot(data = los_services_treatment_completed, aes(x = services_d, y = los_completed_percentage, fill = los_bin)) +
+  geom_col() +
+  theme(axis.text.x = element_text(angle = 40, hjust = 1, size = 5)) + 
+  facet_wrap(~los_bin) +
+  labs(title = "Treatment Completed with Services & LOS",
+       x = "Services",
+       y = "Percentage of Treatment Completed")
 ```
 
-**What the combined view adds:**
+**What the combined view adds:** What the combined view adds that the two separate charts could not was the percentage of treatment completed at each individual service at a specific length of stay.
 
 ------------------------------------------------------------------------
 
